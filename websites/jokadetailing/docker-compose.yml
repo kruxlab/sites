@@ -1,0 +1,12 @@
+services:
+  jokadetailing:
+    build: .
+    environment:
+      - VIRTUAL_HOST=jokadetailing.com
+      - LETSENCRYPT_HOST=jokadetailing.com
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true
