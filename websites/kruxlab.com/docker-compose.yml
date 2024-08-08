@@ -1,0 +1,12 @@
+services:
+  kruxlab:
+    build: .
+    environment:
+      - VIRTUAL_HOST=kruxlab.com,www.kruxlab.com
+      - LETSENCRYPT_HOST=kruxlab.com,www.kruxlab.com
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true

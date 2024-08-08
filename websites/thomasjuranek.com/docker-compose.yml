@@ -1,0 +1,12 @@
+services:
+  thomasjuranek:
+    build: .
+    environment:
+      - VIRTUAL_HOST=thomasjuranek.com,www.thomasjuranek.com
+      - LETSENCRYPT_HOST=thomasjuranek.com,www.thomasjuranek.com
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true
