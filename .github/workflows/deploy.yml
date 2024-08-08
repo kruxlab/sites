@@ -8,43 +8,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v39
-        with:
-          files: |
-            websites/**/docker-compose.yml
-
-      - name: Deploy changed websites
-        if: steps.changed-files.outputs.any_changed == 'true'
+      - name: Deploy websites
         env:
           PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           HOST: ${{ secrets.SERVER_HOST }}
           USER: ${{ secrets.SERVER_USER }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          changed_websites=()
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            website=$(echo $file | cut -d'/' -f2)
-            changed_websites+=("$website")
-          done
-
           ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << EOF
-            cd sites 
+            cd sites
             git pull
             
-            # Stop and remove changed websites
-            for website in "${changed_websites[@]}"; do
-              docker-compose -f docker-compose.yml -f websites/$website/docker-compose.yml down --rmi local
-            done
-            
-            # Start changed websites
-            for website in "${changed_websites[@]}"; do
-              docker-compose -f docker-compose.yml -f websites/$website/docker-compose.yml up -d --build
+            # Update each website
+            for website in websites/*/; do
+              website_name=$(basename $website)
+              echo "Updating $website_name"
+              docker-compose -f docker-compose.yml -f $website/docker-compose.yml down --rmi local
+              docker-compose -f docker-compose.yml -f $website/docker-compose.yml up -d --build
             done
             
             # Prune Docker system
