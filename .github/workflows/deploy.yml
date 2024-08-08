@@ -19,16 +19,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
             cd sites
             git pull
-            
-            # Update each website
-            for website in websites/*/; do
-              website_name=$(basename "$website")
-              echo "Updating $website_name"
-              docker-compose -f docker-compose.yml -f "$website/docker-compose.yml" down --rmi local
-              docker-compose -f docker-compose.yml -f "$website/docker-compose.yml" up -d --build
-            done
-            
-            # Prune Docker system
+            chmod +x ./deploy.sh
+            ./deploy.sh
             docker system prune -af
           EOF
 
