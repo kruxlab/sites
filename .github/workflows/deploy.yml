@@ -19,6 +19,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
             cd sites
             git pull
+            docker compose up -d
             chmod +x ./deploy.sh
             ./deploy.sh
             docker system prune -af
